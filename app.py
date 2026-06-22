@@ -226,7 +226,7 @@ st.markdown(
     """
     ### AI Powered Climate Forecasting Dashboard
     
-    Upload POWER Daily Climate Dataset
+    Upload Daily Climate Dataset
     and generate a 7-day temperature forecast.
     """
 )
@@ -240,7 +240,7 @@ st.sidebar.header(
 )
 
 uploaded_file = st.sidebar.file_uploader(
-    "POWER CSV",
+    "Upload CSV",
     type=["csv"]
 )
 
@@ -534,5 +534,5 @@ if uploaded_file is not None:
 else:
 
     st.info(
-        "Upload NASA POWER CSV from the sidebar to begin forecasting."
+        "Upload CSV from the sidebar to begin forecasting."
     )

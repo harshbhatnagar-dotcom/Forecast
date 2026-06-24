@@ -488,25 +488,7 @@ if uploaded_file is not None:
                 """
             )
 
-            st.metric(
-                "Temperature",
-                f"{temp:.1f} °C"
-            )
-
-            st.metric(
-                "Humidity",
-                f"{humidity:.1f}%"
-            )
-
-            st.metric(
-                "Rainfall",
-                f"{rain:.1f} mm"
-            )
-
-            st.metric(
-                "Wind Speed",
-                f"{wind:.1f} m/s"
-            )
+            
 
         st.divider()
 

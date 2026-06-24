@@ -5,3 +5,5 @@ tensorflow==2.20.0
 joblib
 plotly
 scikit-learn
+folium
+streamlit-folium

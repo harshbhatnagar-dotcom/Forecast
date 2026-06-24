@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import joblib
 import plotly.graph_objects as go
+import folium
+import re
+from streamlit_folium import st_folium
 
 from tensorflow.keras.models import load_model
 from datetime import timedelta
@@ -316,6 +319,198 @@ if uploaded_file is not None:
         st.divider()
 
         # ====================================
+        # GEO MAP + DIGITAL TWIN
+        # ====================================
+
+        st.subheader(
+            "🌍 Geospatial Climate Intelligence"
+        )
+
+        # Default coordinates
+
+        lat = 28.61
+        lon = 77.23
+
+        try:
+
+            filename = uploaded_file.name
+
+            match = re.search(
+                r'_(\d+)d(\d+)N_(\d+)d(\d+)E',
+                filename
+            )
+
+            if match:
+
+                lat = float(
+                    match.group(1) + "." + match.group(2)
+                )
+
+                lon = float(
+                    match.group(3) + "." + match.group(4)
+                )
+
+        except:
+            pass
+
+
+        # Climate State Logic
+
+        temp = latest["T2M"]
+        humidity = latest["RH2M"]
+        rain = latest["PRECTOTCORR"]
+        wind = latest["WS2M_MAX"]
+
+        if temp >= 40:
+
+            climate_state = "🔥 Extreme Heat"
+
+        elif temp >= 35 and humidity < 40:
+
+            climate_state = "☀️ Hot & Dry"
+
+        elif rain > 5:
+
+            climate_state = "🌧 Rainy"
+
+        elif humidity > 70:
+
+            climate_state = "💧 Humid"
+
+        else:
+
+            climate_state = "🌤 Pleasant"
+
+
+        col1, col2 = st.columns([2, 1])
+
+        with col1:
+
+            m = folium.Map(
+                location=[lat, lon],
+                zoom_start=8
+            )
+
+            popup_text = f"""
+            <b>ClimateVerse AI</b><br>
+            Temp: {temp:.1f} °C<br>
+            Humidity: {humidity:.1f}%<br>
+            Rainfall: {rain:.1f} mm<br>
+            Wind: {wind:.1f} m/s<br>
+            State: {climate_state}
+            """
+
+            folium.Marker(
+                [lat, lon],
+                popup=popup_text,
+                tooltip="Forecast Location"
+            ).add_to(m)
+
+            st_folium(
+                m,
+                height=450,
+                use_container_width=True
+            )
+
+        with col2:
+
+            st.markdown(
+                "### 🌆 Digital Twin"
+            )
+
+            if climate_state == "🔥 Extreme Heat":
+
+                twin = """
+                ☀️☀️☀️
+
+                🏢🏢🏢
+
+                🌡 42°C+
+
+                🔥 HEATWAVE
+                """
+
+            elif climate_state == "☀️ Hot & Dry":
+
+                twin = """
+                ☀️☀️
+
+                🏢🏢🏢
+
+                🌵🌵
+
+                HOT & DRY
+                """
+
+            elif climate_state == "🌧 Rainy":
+
+                twin = """
+                ☁️☁️☁️
+
+                🌧🌧🌧
+
+                🏢🏢🏢
+
+                RAINY
+                """
+
+            elif climate_state == "💧 Humid":
+
+                twin = """
+                ☁️☁️
+
+                💧💧💧
+
+                🏢🏢🏢
+
+                HUMID
+                """
+
+            else:
+
+                twin = """
+                🌤
+
+                🌳🌳🌳
+
+                🏢🏢🏢
+
+                PLEASANT
+                """
+
+            st.markdown(
+                f"""
+                ### {climate_state}
+
+                ```
+                {twin}
+                ```
+                """
+            )
+
+            st.metric(
+                "Temperature",
+                f"{temp:.1f} °C"
+            )
+
+            st.metric(
+                "Humidity",
+                f"{humidity:.1f}%"
+            )
+
+            st.metric(
+                "Rainfall",
+                f"{rain:.1f} mm"
+            )
+
+            st.metric(
+                "Wind Speed",
+                f"{wind:.1f} m/s"
+            )
+
+        st.divider()
+
+        # ====================================
         # LAST 30 DAYS
         # ====================================
 
@@ -519,7 +714,6 @@ if uploaded_file is not None:
         st.caption(
             """
             ClimateVerse AI
-            | NASA POWER Data
             | TensorFlow LSTM Forecasting
             | Forecast Horizon: 7 Days
             """
